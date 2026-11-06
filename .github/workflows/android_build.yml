@@ -23,13 +23,20 @@ jobs:
         distribution: 'temurin'
         java-version: '17'
 
-    - name: Build APK with Gradle
+    - name: Setup Android SDK
+      uses: android-actions/setup-android@v3
+
+    - name: Accept Android SDK Licenses
+      run: |
+        yes | sdkmanager --licenses || true
+
+    - name: Build APK with Clean Gradle Cache
       run: |
         if [ ! -f ./gradlew ]; then
           gradle wrapper --gradle-version 8.5
         fi
         chmod +x ./gradlew
-        ./gradlew assembleDebug --no-daemon
+        ./gradlew clean assembleDebug --no-daemon --refresh-dependencies
 
     - name: Upload APK Artifact
       uses: actions/upload-artifact@v4

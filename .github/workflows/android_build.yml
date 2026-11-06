@@ -26,12 +26,14 @@ jobs:
     - name: Grant Execute Permission for Gradlew
       run: chmod +x ./gradlew
 
-    - name: Build Debug APK Cleanly
+    - name: Build Debug APK with Uniform SDK Path
       env:
         ANDROID_HOME: /usr/local/lib/android/sdk
         ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
       run: |
         rm -f local.properties
+        export ANDROID_HOME=/usr/local/lib/android/sdk
+        export ANDROID_SDK_ROOT=/usr/local/lib/android/sdk
         ./gradlew clean assembleDebug --no-daemon --refresh-dependencies
 
     - name: Upload APK Artifact

@@ -23,25 +23,23 @@ jobs:
         distribution: 'temurin'
         java-version: '17'
 
-    - name: Clean All Local Paths and Caches
-      run: |
-        rm -f local.properties
-        find . -name "local.properties" -delete
-        rm -rf .gradle app/.gradle
+    - name: Setup Android SDK
+      uses: android-actions/setup-android@v3
 
-    - name: Build Debug APK with Fresh Environment
-      env:
-        ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
-        ANDROID_HOME: /usr/local/lib/android/sdk
+    - name: Accept Android SDK Licenses
       run: |
-        export PATH=$PATH:$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$ANDROID_SDK_ROOT/platform-tools
         yes | sdkmanager --licenses || true
-        
+
+    - name: Generate Gradle Wrapper if Missing
+      run: |
         if [ ! -f ./gradlew ]; then
           gradle wrapper --gradle-version 8.5
         fi
         chmod +x ./gradlew
-        ./gradlew clean assembleDebug --no-daemon --refresh-dependencies
+
+    - name: Build Debug APK with Gradle
+      run: |
+        ./gradlew clean assembleDebug --no-daemon
 
     - name: Upload APK Artifact
       uses: actions/upload-artifact@v4

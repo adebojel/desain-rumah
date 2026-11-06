@@ -26,41 +26,20 @@ jobs:
     - name: Grant Execute Permission for Gradlew
       run: chmod +x ./gradlew
 
-    - name: Setup Android SDK and Build Tools Manually
-      env:
-        ANDROID_HOME: /opt/android-sdk
-        ANDROID_SDK_ROOT: /opt/android-sdk
+    - name: Configure Clean Android SDK Environment
       run: |
-        sudo mkdir -p /opt/android-sdk
-        sudo chown -R $USER:$USER /opt/android-sdk
+        # Buat file local.properties secara otomatis di server dengan path SDK bawaan runner Ubuntu
+        echo "sdk.dir=/usr/local/lib/android/sdk" > local.properties
         
-        # Download Android command-line tools
-        CMDLINES_URL="https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip"
-        wget -q $CMDLINES_URL -O cmdlines.zip
-        mkdir -p temp_cmdlines
-        unzip -q cmdlines.zip -d temp_cmdlines
-        mkdir -p /opt/android-sdk/cmdline-tools
-        mv temp_cmdlines/cmdline-tools /opt/android-sdk/cmdline-tools/latest
-        rm -rf cmdlines.zip temp_cmdlines
+        # Bersihkan cache transform gradle yang menyimpan path termux
+        rm -rf ~/.gradle/caches/transforms-*
+        rm -rf ~/.gradle/caches/modules-*
 
-        # Set PATH
-        echo "ANDROID_HOME=/opt/android-sdk" >> $GITHUB_ENV
-        echo "ANDROID_SDK_ROOT=/opt/android-sdk" >> $GITHUB_ENV
-        echo "/opt/android-sdk/cmdline-tools/latest/bin" >> $GITHUB_PATH
-        echo "/opt/android-sdk/platform-tools" >> $GITHUB_PATH
-
-        # Accept licenses and install platform 34 & build-tools 34.0.0
-        export PATH=$PATH:/opt/android-sdk/cmdline-tools/latest/bin:/opt/android-sdk/platform-tools
-        yes | sdkmanager --licenses || true
-        sdkmanager "platform-tools" "platforms;android-34" "build-tools;34.0.0"
-
-    - name: Build Debug APK with Self-Contained SDK
+    - name: Build Debug APK
       env:
-        ANDROID_HOME: /opt/android-sdk
-        ANDROID_SDK_ROOT: /opt/android-sdk
+        ANDROID_HOME: /usr/local/lib/android/sdk
+        ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
       run: |
-        rm -f local.properties
-        export PATH=$PATH:/opt/android-sdk/cmdline-tools/latest/bin:/opt/android-sdk/platform-tools
         ./gradlew clean assembleDebug --no-daemon --refresh-dependencies
 
     - name: Upload APK Artifact

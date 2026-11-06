@@ -23,12 +23,13 @@ jobs:
         distribution: 'temurin'
         java-version: '17'
 
-    - name: Clean Conflicting Properties
+    - name: Clean All Local Paths and Caches
       run: |
         rm -f local.properties
         find . -name "local.properties" -delete
+        rm -rf .gradle app/.gradle
 
-    - name: Build Debug APK with Clean SDK Environment
+    - name: Build Debug APK with Fresh Environment
       env:
         ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
         ANDROID_HOME: /usr/local/lib/android/sdk
@@ -40,7 +41,7 @@ jobs:
           gradle wrapper --gradle-version 8.5
         fi
         chmod +x ./gradlew
-        ./gradlew clean assembleDebug --no-daemon
+        ./gradlew clean assembleDebug --no-daemon --refresh-dependencies
 
     - name: Upload APK Artifact
       uses: actions/upload-artifact@v4

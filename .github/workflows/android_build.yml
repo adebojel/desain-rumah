@@ -26,13 +26,18 @@ jobs:
     - name: Grant Execute Permission for Gradlew
       run: chmod +x ./gradlew
 
-    - name: Build Debug APK with Forced Clean SDK Path
+    - name: Nuke Gradle Caches & Build Corruptions
+      run: |
+        # Hapus total cache Gradle di runner yang menyimpan path termux
+        rm -rf ~/.gradle/caches ~/.gradle/wrapper
+        rm -rf app/build build .gradle
+        rm -f local.properties
+
+    - name: Build Debug APK with Fresh Server Environment
       env:
         ANDROID_HOME: /usr/local/lib/android/sdk
         ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
       run: |
-        # Hapus file local.properties jika tercipta otomatis saat build
-        rm -f local.properties
         ./gradlew clean assembleDebug --no-daemon --refresh-dependencies
 
     - name: Upload APK Artifact

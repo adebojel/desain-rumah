@@ -23,13 +23,14 @@ jobs:
         distribution: 'temurin'
         java-version: '17'
 
-    - name: Build APK Automatically with Standard Gradle
+    - name: Grant Execute Permission for Gradlew
+      run: chmod +x ./gradlew
+
+    - name: Build Debug APK with Unified SDK Paths
+      env:
+        ANDROID_HOME: /usr/local/lib/android/sdk
+        ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
       run: |
-        if [ ! -f ./gradlew ]; then
-          gradle wrapper --gradle-version 8.5
-        fi
-        chmod +x ./gradlew
-        # Jalankan build bersih langsung secara mandiri
         ./gradlew clean assembleDebug --no-daemon
 
     - name: Upload APK Artifact

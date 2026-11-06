@@ -23,27 +23,21 @@ jobs:
         distribution: 'temurin'
         java-version: '17'
 
-    - name: Clean Local Properties & Termux Paths
+    - name: Clean Local Properties
       run: |
         rm -f local.properties
         find . -name "local.properties" -delete
 
-    - name: Setup Android SDK & Build Tools
-      uses: android-actions/setup-android@v3
-
-    - name: Accept Android SDK Licenses
+    - name: Accept Android SDK Licenses & Build
       run: |
+        export ANDROID_HOME=$HOME/android-sdk
+        mkdir -p $ANDROID_HOME
         yes | sdkmanager --licenses || true
-
-    - name: Generate Gradle Wrapper if Missing
-      run: |
+        
         if [ ! -f ./gradlew ]; then
           gradle wrapper --gradle-version 8.5
         fi
         chmod +x ./gradlew
-
-    - name: Build Debug APK with Gradle
-      run: |
         ./gradlew clean assembleDebug --no-daemon
 
     - name: Upload APK Artifact

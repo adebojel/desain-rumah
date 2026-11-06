@@ -23,22 +23,20 @@ jobs:
         distribution: 'temurin'
         java-version: '17'
 
-    - name: Setup Android SDK
-      uses: android-actions/setup-android@v3
-
-    - name: Accept Android SDK Licenses
+    - name: Build Debug APK with Manual SDK Config
+      env:
+        ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
       run: |
+        export PATH=$PATH:$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$ANDROID_SDK_ROOT/platform-tools
+        
+        # Accept licenses safely without legacy tools package
         yes | sdkmanager --licenses || true
+        sdkmanager "platforms;android-34" "build-tools;34.0.0" || true
 
-    - name: Generate Gradle Wrapper if Missing
-      run: |
         if [ ! -f ./gradlew ]; then
           gradle wrapper --gradle-version 8.5
         fi
         chmod +x ./gradlew
-
-    - name: Build Debug APK with Gradle
-      run: |
         ./gradlew clean assembleDebug --no-daemon
 
     - name: Upload APK Artifact

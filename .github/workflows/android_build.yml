@@ -1,4 +1,4 @@
-name: Auto Build Desain Rumah V53 APK
+name: Auto Build Desain Rumah V53 APK & Release
 
 on:
   push:
@@ -9,6 +9,9 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
 
     steps:
     - name: Checkout Repository
@@ -38,3 +41,14 @@ jobs:
       with:
         name: app-debug-v53
         path: app/build/outputs/apk/debug/app-debug.apk
+
+    - name: Auto Create GitHub Release
+      uses: softprops/action-gh-release@v1
+      if: startsWith(github.ref, 'refs/heads/main')
+      with:
+        files: app/build/outputs/apk/debug/app-debug.apk
+        tag_name: v1.53.0-${{ github.run_number }}
+        name: "Desain Rumah V53 Build #${{ github.run_number }}"
+        body: "Automated build release containing 63 AI models integration for Desain Rumah V53."
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

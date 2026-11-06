@@ -23,15 +23,17 @@ jobs:
         distribution: 'temurin'
         java-version: '17'
 
-    - name: Clean Local Properties
+    - name: Clean Conflicting Properties
       run: |
         rm -f local.properties
         find . -name "local.properties" -delete
 
-    - name: Accept Android SDK Licenses & Build
+    - name: Build Debug APK with Clean SDK Environment
+      env:
+        ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
+        ANDROID_HOME: /usr/local/lib/android/sdk
       run: |
-        export ANDROID_HOME=$HOME/android-sdk
-        mkdir -p $ANDROID_HOME
+        export PATH=$PATH:$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$ANDROID_SDK_ROOT/platform-tools
         yes | sdkmanager --licenses || true
         
         if [ ! -f ./gradlew ]; then

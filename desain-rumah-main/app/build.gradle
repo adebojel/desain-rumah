@@ -1,0 +1,30 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'com.adebojel.desainrumah'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId "com.adebojel.desainrumah"
+        minSdk 21
+        targetSdk 34
+        versionCode 53
+        versionName "53.0.0"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+        }
+        debug {
+            minifyEnabled false
+        }
+    }
+}
+
+dependencies {
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'com.google.android.material:material:1.9.0'
+}
